@@ -1,18 +1,31 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { getGuidance } from '../apiService';
+import FeedbackButtons from './FeedbackButtons';
 
 export default function ChatInterface({ onFirstInteraction, hasInteracted }) {
+  // Generar session_id único al montar el componente (memoria conversacional)
+  const [sessionId] = useState(() => {
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substring(2, 9);
+    return `session_${timestamp}_${random}`;
+  });
+
   const [messages, setMessages] = useState([
     {
       id: 'init',
       role: 'assistant',
-      content: '¡Hola! Soy tu asistente virtual para trámites municipales. ¿En qué puedo ayudarte hoy?',
+      content: '¡Hola! Soy tu asistente virtual para trámites municipales con <strong>memoria conversacional</strong>. Puedo recordar nuestra conversación, así que puedes hacerme preguntas de seguimiento. ¿En qué puedo ayudarte hoy?',
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [inputValue, setInputValue] = useState('');
   const messagesEndRef = useRef(null);
   const hasInteractedRef = useRef(false);
+
+  // Log del session_id para debugging
+  useEffect(() => {
+    console.log('🧠 Memoria conversacional activa - Session ID:', sessionId);
+  }, [sessionId]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,13 +55,16 @@ export default function ChatInterface({ onFirstInteraction, hasInteracted }) {
     setIsLoading(true);
 
     try {
-      const assistantResponse = await getGuidance(inputValue);
+      // Enviar con session_id para memoria conversacional
+      const assistantResponse = await getGuidance(inputValue, sessionId);
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: assistantResponse.guidanceHtml,
         downloadUrl: assistantResponse.downloadUrl,
         documentName: assistantResponse.documentName,
+        sources: assistantResponse.sources,
+        userQuery: inputValue, // Track user query for feedback
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -66,9 +82,7 @@ export default function ChatInterface({ onFirstInteraction, hasInteracted }) {
 
   const quickActions = [
     { label: 'Preguntas Frecuentes', query: 'Preguntas Frecuentes' },
-    { label: 'Ayuda con el RAG', query: 'ayuda con el rag' },
-    { label: 'Temas disponibles', query: 'temas disponibles' },
-    { label: 'Ayuda general', query: 'ayuda' },
+    { label: 'Guía Técnica: Optimiza tus consultas con el sistema RAG', query: 'ayuda con el rag' },
   ];
 
   const handleQuickAction = async (query) => {
@@ -88,11 +102,14 @@ export default function ChatInterface({ onFirstInteraction, hasInteracted }) {
     setIsLoading(true);
 
     try {
-      const assistantResponse = await getGuidance(query);
+      // Enviar con session_id para memoria conversacional
+      const assistantResponse = await getGuidance(query, sessionId);
       const assistantMessage = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: assistantResponse.guidanceHtml,
+        sources: assistantResponse.sources,
+        userQuery: query, // Track user query for feedback
       };
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error) {
@@ -110,11 +127,17 @@ export default function ChatInterface({ onFirstInteraction, hasInteracted }) {
 
   return (
     <div className={`bg-white rounded-lg shadow-2xl flex flex-col ${hasInteracted ? 'h-[calc(100vh-2rem)]' : 'h-[70vh] max-h-[800px]'}`}>
-      {/* Botones de acceso rápido - ARRIBA DEL CHAT */}
-      <div className="border-b border-gray-200 p-4 bg-gradient-to-r from-blue-50 to-purple-50">
-        <p className="text-sm text-gray-700 mb-3 font-semibold flex items-center">
-          Accesos rápidos
-        </p>
+      {/* Header con indicador de memoria activa */}
+      <div className="border-b border-gray-200 p-4 bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm text-gray-700 font-semibold flex items-center">
+            Accesos rápidos
+          </p>
+          <div className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+            <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+            Memoria activa
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-2">
           {quickActions.map((action, idx) => (
             <button
@@ -143,14 +166,24 @@ export default function ChatInterface({ onFirstInteraction, hasInteracted }) {
                 🤖
               </div>
             )}
-            <div
-              className={`max-w-[80%] p-4 rounded-lg ${
-                msg.role === 'user'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-100 text-gray-800'
-              }`}
-              dangerouslySetInnerHTML={{ __html: msg.content }}
-            />
+            <div className={`max-w-[80%] ${msg.role === 'user' ? '' : 'flex-1'}`}>
+              <div
+                className={`p-4 rounded-lg ${
+                  msg.role === 'user'
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 text-gray-800'
+                }`}
+                dangerouslySetInnerHTML={{ __html: msg.content }}
+              />
+              {/* Add feedback buttons for assistant messages (except initial greeting) */}
+              {msg.role === 'assistant' && msg.id !== 'init' && msg.userQuery && (
+                <FeedbackButtons
+                  message={msg}
+                  sessionId={sessionId}
+                  onFeedbackSubmit={() => console.log('Feedback submitted for message:', msg.id)}
+                />
+              )}
+            </div>
             {msg.role === 'user' && (
               <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center text-white">
                 👤

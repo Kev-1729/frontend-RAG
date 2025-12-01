@@ -1,0 +1,191 @@
+/*
+ * Estilos para respuestas RAG - Atención Ciudadana
+ * Sistema Municipal de Carabayllo
+ */
+
+/* Resumen principal */
+.rag-summary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.rag-summary h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: white;
+}
+
+.rag-summary p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Secciones normales */
+.rag-section {
+  background: #f8fafc;
+  border-left: 4px solid #3b82f6;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.rag-section:hover {
+  background: #f1f5f9;
+  border-left-color: #2563eb;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.1);
+}
+
+.rag-section h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e40af;
+  letter-spacing: 0.5px;
+}
+
+.rag-section p {
+  margin: 0.5rem 0;
+  line-height: 1.7;
+  color: #334155;
+  font-size: 0.95rem;
+}
+
+.rag-section ul,
+.rag-section ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.rag-section li {
+  margin: 0.5rem 0;
+  line-height: 1.6;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.rag-section li strong {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+/* Lista numerada (procedimientos) */
+.rag-section ol {
+  counter-reset: item;
+  list-style-type: none;
+}
+
+.rag-section ol li {
+  counter-increment: item;
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.rag-section ol li::before {
+  content: counter(item) ".";
+  font-weight: 700;
+  color: #3b82f6;
+  margin-right: 0.5rem;
+}
+
+/* Información importante (advertencias) */
+.rag-important {
+  background: #fef3c7;
+  border-left: 4px solid #f59e0b;
+  padding: 1.25rem;
+  margin-bottom: 1.25rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.1);
+}
+
+.rag-important h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #b45309;
+  letter-spacing: 0.5px;
+}
+
+.rag-important p,
+.rag-important li {
+  color: #78350f;
+  line-height: 1.7;
+  font-size: 0.95rem;
+}
+
+.rag-important ul {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.rag-important li {
+  margin: 0.5rem 0;
+}
+
+.rag-important strong {
+  color: #92400e;
+  font-weight: 600;
+}
+
+/* Fuentes */
+.rag-sources {
+  background: #f1f5f9;
+  border-top: 2px solid #cbd5e1;
+  padding: 1rem;
+  margin-top: 1.5rem;
+  border-radius: 6px;
+}
+
+.rag-sources p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+.rag-sources em {
+  color: #475569;
+}
+
+/* Elementos generales */
+strong {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+em {
+  font-style: italic;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .rag-summary,
+  .rag-section,
+  .rag-important {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .rag-summary h3,
+  .rag-section h3,
+  .rag-important h3 {
+    font-size: 0.95rem;
+  }
+
+  .rag-summary p,
+  .rag-section p,
+  .rag-section li,
+  .rag-important p,
+  .rag-important li {
+    font-size: 0.875rem;
+  }
+}
